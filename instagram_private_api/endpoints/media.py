@@ -211,13 +211,15 @@ class MediaEndpointsMixin(object):
         params.update(self.authenticated_params)
         return self._call_api(endpoint, params=params)
 
-    def post_comment(self, media_id, comment_text):
+    def post_comment(self, media_id, comment_text, replied_to_comment_id=None):
         """
         Post a comment.
         Comment text validation according to https://www.instagram.com/developer/endpoints/comments/#post_media_comments
 
         :param media_id: Media id
         :param comment_text: Comment text
+        :param replied_to_comment_id: The comment ID you are replying to, if this is a reply (ie "17895795823020906");
+        when replying, your comment_text MUST contain an @-mention at the start (ie "@theirusername Hello!").
         :return:
             .. code-block:: javascript
 
@@ -262,6 +264,12 @@ class MediaEndpointsMixin(object):
             'containermodule': 'comments_feed_timeline',
             'radio_type': self.radio_type,
         }
+
+        if replied_to_comment_id is not None:
+            if comment_text[0] != '@':
+                raise ValueError('When replying to a comment, your text must begin with an @-mention to their username.')
+        params['replied_to_comment_id'] = replied_to_comment_id
+
         params.update(self.authenticated_params)
         res = self._call_api(endpoint, params=params)
         if self.auto_patch:
