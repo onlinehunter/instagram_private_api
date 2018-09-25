@@ -10,6 +10,7 @@ from .locations import LocationsEndpointsMixin
 from .tags import TagsEndpointsMixin
 from .upload import UploadEndpointsMixin
 from .users import UsersEndpointsMixin
+from .direct import DirectMiscEndpointsMixin
 from .usertags import UsertagsEndpointsMixin
 from .collections import CollectionsEndpointsMixin
 from .highlights import HighlightsEndpointsMixin
