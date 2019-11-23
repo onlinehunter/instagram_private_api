@@ -222,3 +222,24 @@ class AccountsEndpointsMixin(object):
     def disable_presence_status(self):
         """Disable presence status setting"""
         return self.set_presence_status(True)
+
+    def checkpoint_challenge_required_choice(self, challenge_api_path):
+
+        params = {
+            'device_id': self.device_id,
+            'guid': self.uuid,
+            '_csrftoken': self.csrftoken,
+            'choice': 1,
+        }
+        return self._call_api(challenge_api_path, params=params)
+
+    def checkpoint_challenge_required_verificate(self, challenge_api_path, verification_code):
+        params = {
+            'device_id': self.device_id,
+            'guid': self.uuid,
+            '_csrftoken': self.csrftoken,
+            'security_code': verification_code,
+        }
+        return self._call_api(challenge_api_path, params=params)
+
+

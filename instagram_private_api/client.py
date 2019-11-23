@@ -96,7 +96,8 @@ class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
         self.api_url = kwargs.pop('api_url', None) or self.API_URL
         self.timeout = kwargs.pop('timeout', 15)
         self.on_login = kwargs.pop('on_login', None)
-        self.logger = logger
+        self.need_auth = kwargs.pop('need_auth', True)
+        self.logger = kwargs.pop('logger', logger)
 
         user_settings = kwargs.pop('settings', None) or {}
         self.uuid = (
@@ -199,7 +200,9 @@ class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
         if not cookie_string:   # [TODO] There's probably a better way than to depend on cookie_string
             if not self.username or not self.password:
                 raise ClientLoginRequiredError('login_required', code=400)
-            self.login()
+
+            if self.need_auth:
+                self.login()
 
         self.logger.debug('USERAGENT: {0!s}'.format(self.user_agent))
         super(Client, self).__init__()
@@ -486,7 +489,12 @@ class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
         :param version: for the versioned api base url. Default 'v1'.
         :return:
         """
-        url = '{0}{1}'.format(self.api_url.format(version=version), endpoint)
+        if 'https://' in endpoint:
+            url = endpoint
+        else:
+            if endpoint.startswith('/'):
+                endpoint = endpoint[1:]
+            url = '{0}{1}'.format(self.api_url.format(version=version), endpoint)
         if query:
             url += ('?' if '?' not in endpoint else '&') + compat_urllib_parse.urlencode(query)
 

@@ -71,6 +71,16 @@ class ClientCheckpointRequiredError(ClientError):
             logger.warning('Error parsing error response: {}'.format(str(ve)))
         return None
 
+    @property
+    def challenge_api_path(self):
+        try:
+            error_info = json.loads(self.error_response)
+            return error_info.get('challenge', {}).get('api_path')
+        except ValueError as ve:
+            logger.warning('Error parsing error response: {}'.format(str(ve)))
+        return None
+
+
 
 class ClientChallengeRequiredError(ClientCheckpointRequiredError):
     """Raise when IG detects suspicious activity from your account"""
